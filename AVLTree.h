@@ -11,6 +11,7 @@ class AVLTree{
 public:
     AVLTree() : root(0) { }
     AVLTree(T val) : root(new Node<T>(val)) { }
+    void insert(T);
 
 private:
     Node<T>* root;
@@ -29,4 +30,42 @@ private:
     Node<T>* right;
     Node<T>* parent;
     int height;
+
+    void insert(Node<T>*, T);
 };
+
+template <class T>
+void AVLTree<T>::insert(T val){
+    if (root){
+        if (val < root->val){
+            insert(root->left, val);
+        } else if (root->val < val){
+            insert(root->right, val);
+        }
+    } else {
+        root->value = val;
+    }
+}
+
+template <class T>
+void AVLTree<T>::insert(Node<T>* node, T val){
+    if (node){
+        if (val < node->val){
+            insert(node->left, val);
+        } else if (node->val < val){
+            insert(node->right, val);
+        }
+    } else {
+        node->value = val;
+    }
+}
+
+template <class T>
+void AVLTree<T>::right_rotate(Node<T>* node){
+
+}
+
+template <class T>
+void AVLTree<T>::left_rotate(Node<T>* node){
+    
+}
