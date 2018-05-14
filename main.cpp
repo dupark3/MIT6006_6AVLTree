@@ -7,5 +7,7 @@ int main(){
     AVLTree<int> my_AVL_tree(5);
     my_AVL_tree.insert(7);
     my_AVL_tree.insert(3);
+    my_AVL_tree.print_sorted();
+    
     return 0;
 }
