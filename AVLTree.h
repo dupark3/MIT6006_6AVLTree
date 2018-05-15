@@ -1,4 +1,5 @@
 #include <cmath> // abs
+#include <iomanip> // setw
 #include <iostream>
 
 // AVL tree has no greater than a difference of 1 in subtree size to its left and right
@@ -14,15 +15,17 @@ public:
     AVLTree(T val) : root(new Node<T>(val)) { }
     void insert(T);
     void print_sorted();
+    void print();
 
 private:
     Node<T>* root;
     void insert(Node<T>*, Node<T>*, T);
-    void right_rotate(Node<T>*);
-    void left_rotate(Node<T>*);
-    void fix_AVL(Node<T>*);
+    void right_rotate(Node<T>*, Node<T>*, Node<T>*);
+    void left_rotate(Node<T>*, Node<T>*, Node<T>*);
+    void fix_AVL(Node<T>*, Node<T>*, Node<T>*);
     void rotate(Node<T>*, Node<T>*, Node<T>*);
     void print_sorted(Node<T>*);
+    void print_tree(Node<T>* node, int indent = 0);
 };
 
 template <class T>
@@ -77,36 +80,68 @@ void AVLTree<T>::insert(Node<T>* node, Node<T>* parent, T val){
             parent->left = node;
         else if (val > parent->value)
             parent->right = node;
-        fix_AVL(node);
+        if (node->parent && node->parent->parent)
+            fix_AVL(node, node->parent, node->parent->parent);
     }
 }
 
 template <class T>
-void AVLTree<T>::fix_AVL(Node<T>* node){
+void AVLTree<T>::fix_AVL(Node<T>* child, Node<T>* parent, Node<T>* grandparent){
+    
+    // find and store the heights of left and right children of the grandparent node
     int left_height = -1;
     int right_height = -1;
-    Node<T>* grandparent = node->parent->parent;
-    Node<T>* parent = node->parent;
-    if(parent && grandparent && grandparent->left)
+    if(grandparent && grandparent->left)
         left_height = grandparent->left->height;
-    if(parent && grandparent && grandparent->right)
+    if(grandparent && grandparent->right)
         right_height = grandparent->right->height;
+    
+    // if heights different by more than 1, call rotate() to find what kind of rotation to do 
     if(std::abs(left_height - right_height) > 1)
-        rotate(grandparent, parent, node);
+        rotate(child, parent, grandparent);
+    // if heights are fine, recursively check a higher set of 3 generation nodes
+    else if (grandparent->parent)
+        fix_AVL(parent, grandparent, grandparent->parent);
 }
 
 template <class T>
-void AVLTree<T>::rotate(Node<T>* grandparent, Node<T>* parent, Node<T>* child){
+void AVLTree<T>::rotate(Node<T>* child, Node<T>* parent, Node<T>* grandparent){
+    // find out if it is L-L, L-R, R-R, or R-L case
+    if(parent == grandparent->left){
+        // L-L case, call right_rotate
+        if (child == parent->left){
+            right_rotate(child, parent, grandparent);
+        } 
+
+        // L-R case, call left_rotate then right_rotate
+        else if (child == parent->right){
+            left_rotate(child, parent, grandparent);
+            right_rotate(child, parent, grandparent);
+        }
+
+    } 
+
+    else if (parent == grandparent->right){
+        // R-R case, call left_rotate
+        if (child == parent->right){
+            left_rotate(child, parent, grandparent);
+        } 
+
+        // R-L case, call right_rotate then left_rotate
+        else if (child == parent->right){
+            right_rotate(child, parent, grandparent);
+            left_rotate(child, parent, grandparent);
+        }
+    }
+}
+
+template <class T>
+void AVLTree<T>::right_rotate(Node<T>* child, Node<T>* parent, Node<T>* grandparent){
 
 }
 
 template <class T>
-void AVLTree<T>::right_rotate(Node<T>* node){
-
-}
-
-template <class T>
-void AVLTree<T>::left_rotate(Node<T>* node){
+void AVLTree<T>::left_rotate(Node<T>* child, Node<T>* parent, Node<T>* grandparent){
     
 }
 
@@ -126,5 +161,26 @@ void AVLTree<T>::print_sorted(Node<T>* node){
         print_sorted(node->left);
         std::cout << node->value << ' ';
         print_sorted(node->right);
+    }
+}
+
+template <class T>
+void AVLTree<T>::print(){
+    if(root){
+        print_tree(root, 0);
+    }
+}
+
+template <class T>
+void AVLTree<T>::print_tree(Node<T>* node, int indent){
+    if(node) {
+        if(node->left) 
+            print_tree(node->left, indent+4);
+        if(node->right) 
+            print_tree(node->right, indent+4);
+        if (indent)
+            std::cout << std::setw(indent) << ' ';
+        
+        std::cout << node->value << "\n ";
     }
 }
