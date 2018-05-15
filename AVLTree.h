@@ -137,22 +137,36 @@ void AVLTree<T>::rotate(Node<T>* child, Node<T>* parent, Node<T>* grandparent){
 
 template <class T>
 void AVLTree<T>::right_rotate(Node<T>* child, Node<T>* parent, Node<T>* grandparent){
+    if (root == grandparent)
+        root = parent;
+    else if (grandparent->parent->left == grandparent)
+        grandparent->parent->left = parent;
+    else if (grandparent->parent->right == grandparent)
+        grandparent->parent->right = parent;
+
+    grandparent->left = parent->right;
+    if (grandparent->left)
+        grandparent->left->parent = grandparent;
+
+    grandparent->parent = parent;
+    parent->right = grandparent;
+    parent->parent = grandparent->parent;
 
 }
 
 template <class T>
 void AVLTree<T>::left_rotate(Node<T>* child, Node<T>* parent, Node<T>* grandparent){
-    if (root == grandparent){
-        std::cout << "Root";
+    if (root == grandparent)
         root = parent;
-    }
-    grandparent->right = parent->left;
-    if (grandparent->right)
-        grandparent->right->parent = grandparent;
-    if (grandparent->parent->left == grandparent)
+    else if (grandparent->parent->left == grandparent)
         grandparent->parent->left = parent;
     else if (grandparent->parent->right == grandparent)
         grandparent->parent->right = parent;
+
+    grandparent->right = parent->left;
+    if (grandparent->right)
+        grandparent->right->parent = grandparent;
+    
     grandparent->parent = parent;
     parent->left = grandparent;
     parent->parent = grandparent->parent;
